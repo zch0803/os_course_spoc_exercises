@@ -44,7 +44,7 @@ NOTICE
 伙伴分配器的一个极简实现
 http://coolshell.cn/tag/buddy
 ```
-<code>
+`code`
 // Implementation of malloc/free using first-fit
 // 
 // Created by: Junjie Ke 2012011335, Chenghui Zhao 2012011384
@@ -159,7 +159,7 @@ int main(int argc, char *argv[]) {
   memtest();
   return 0;
 }
-<code>
+`code`
 --- 
 
 ## 扩展思考题
