@@ -13,6 +13,7 @@
 
 (2) 如何知道ucore的两个线程同在一个进程？
 > 通过查看线程的父进程
+
 (3) context和trapframe分别在什么时候用到？
 > context 在切换进程时使用，trapframe在遇到中断，系统调用和异常时使用。
 
@@ -28,6 +29,7 @@ tf.tf_eip = (uint32_t) kernel_thread_entry;
 /kern/process/entry.S
 ```
 > pushl %edx 通过将对应函数的入口地址压栈，然后中断完成后跳到该地址执行。
+
 (6)内核线程的堆栈初始化在哪？
 ```
 tf和context中的esp
@@ -36,8 +38,10 @@ tf和context中的esp
 
 (7)fork()父子进程的返回值是不同的。这在源代码中的体现中哪？
 > fork中ret的返回值为父进程的返回值，子进程的返回值定义在copy_thread中的tf的eax中。
+
 (8)内核线程initproc的第一次执行流程是什么样的？能跟踪出来吗？
 > 首先用通过Kernel_Thread调用init_main,然后init_main进行输出字符串，然后通过do_fork进行线程创建，进入函数运行。
+
 ## 小组练习与思考题
 
 (1)(spoc) 理解内核线程的生命周期。
