@@ -31,6 +31,24 @@ run_link、list_link、hash_link
 
 1. 试分析wait()和exit()的结果放在什么地方？exit()是在什么时候放进去的？wait()在什么地方取到出的？
 2. 试分析ucore操作系统内核是如何把子进程exit()的返回值传递给父进程wait()的？
+```
+exit函数会调用do_exit函数，通过它来设置状态和exit_code，代码如下：
+
+	current->state = PROC_ZOMBIE;
+	current->exit_code = error_code;
+
+然后父进程的wait会调用do\_wait(int pid, int *code_store)函数：
+
+	found：
+		if (proc == idleproc || proc == initproc) {
+	    	panic("wait idleproc or initproc.\n");
+		}
+		if (code_store != NULL) {
+		    *code_store = proc->exit_code;
+		}
+
+找到后把code\_store设置为刚退出的子进程的exit_code。
+```
 2. 试分析sleep()系统调用的实现。在什么地方设置的定时器？它对应的等待队列是哪个？它的唤醒操作在什么地方？
 3. 通常的函数调用和函数返回都是一一对应的。有不是一一对应的例外情况？如果有，请举例说明。
 
