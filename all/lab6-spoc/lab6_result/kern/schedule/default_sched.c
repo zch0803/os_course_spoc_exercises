@@ -71,7 +71,7 @@ stride_enqueue(struct run_queue *rq, struct proc_struct *proc) {
      }
      proc->rq = rq;
      rq->proc_num ++;
-     cprintf("%d proc enqueue\n",proc->pid);
+     cprintf("%d proc enqueue proc_prioperty:%d proc_stride:%u \n",proc->pid,proc->lab6_priority,proc->lab6_stride);
 }
 
 /*
@@ -93,7 +93,7 @@ stride_dequeue(struct run_queue *rq, struct proc_struct *proc) {
      list_del_init(&(proc->run_link));
 #endif
      rq->proc_num --;
-     cprintf("%d proc dequeue\n",proc->pid);
+     cprintf("%d proc dequeue proc_prioperty:%d proc_stride:%u \n",proc->pid,proc->lab6_priority,proc->lab6_stride);
 }
 /*
  * stride_pick_next pick the element from the ``run-queue'', with the
@@ -133,7 +133,7 @@ stride_pick_next(struct run_queue *rq) {
      if (p->lab6_priority == 0)
           p->lab6_stride += BIG_STRIDE;
      else p->lab6_stride += BIG_STRIDE / p->lab6_priority;
-     cprintf("%d is picked by pick_next\n",p->pid);
+     cprintf("%d is picked by pick_next proc_prioperty:%d proc_stride:%u \n",p->pid,p->lab6_priority,p->lab6_stride);
      return p;
 }
 
