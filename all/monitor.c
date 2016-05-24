@@ -3,6 +3,7 @@
 #include <kmalloc.h>
 #include <assert.h>
 
+#define HANSEN 1
 
 // Initialize monitor.
 void     
@@ -25,7 +26,7 @@ monitor_init (monitor_t * mtp, size_t num_cv) {
 // Unlock one of threads waiting on the condition variable. 
 void 
 cond_signal (condvar_t *cvp) {
-   //LAB7 EXERCISE1: YOUR CODE
+   //LAB7 EXERCISE1: 2013011377
    cprintf("cond_signal begin: cvp %x, cvp->count %d, cvp->owner->next_count %d\n", cvp, cvp->count, cvp->owner->next_count);  
   /*
    *      cond_signal(cv) {
@@ -37,25 +38,25 @@ cond_signal (condvar_t *cvp) {
    *          }
    *       }
    */
-     if(cvp->count>0) {
-        cvp->owner->next_count ++;
-        up(&(cvp->sem));
-        down(&(cvp->owner->next));
-        cvp->owner->next_count --;
-      }
-     /* using hansen
-     if(cvp->count > 0){
-    	 up(&(cvp->sem));
-     }
-     */
-   cprintf("cond_signal end: cvp %x, cvp->count %d, cvp->owner->next_count %d\n", cvp, cvp->count, cvp->owner->next_count);
+#ifdef HANSEN
+  if (cvp->count > 0)
+     up(&cvp->sem);
+#else
+  if (cvp->count > 0) {
+     cvp->owner->next_count++;
+     up(&cvp->sem);
+     down(&cvp->owner->next);
+     cvp->owner->next_count--;
+  }
+#endif //HANSEN
+  cprintf("cond_signal end: cvp %x, cvp->count %d, cvp->owner->next_count %d\n", cvp, cvp->count, cvp->owner->next_count);
 }
 
 // Suspend calling thread on a condition variable waiting for condition Atomically unlocks 
 // mutex and suspends calling thread on conditional variable after waking up locks mutex. Notice: mp is mutex semaphore for monitor's procedures
 void
 cond_wait (condvar_t *cvp) {
-    //LAB7 EXERCISE1: YOUR CODE
+    //LAB7 EXERCISE1: 2013011377
     cprintf("cond_wait begin:  cvp %x, cvp->count %d, cvp->owner->next_count %d\n", cvp, cvp->count, cvp->owner->next_count);
    /*
     *         cv.count ++;
@@ -66,20 +67,20 @@ cond_wait (condvar_t *cvp) {
     *         wait(cv.sem);
     *         cv.count --;
     */
-      cvp->count++;
-      if(cvp->owner->next_count > 0)
-         up(&(cvp->owner->next));
-      else
-         up(&(cvp->owner->mutex));
-      down(&(cvp->sem));
-      cvp->count --;
-
-      /*Hoare
-      cvp->count++;
-      up(&(cvp->owner->mutex));
-      down(&(cvp->sem));
-      up(&(cvp->owner->mutex));
-      cvp->count --;
-      */
+#ifdef HANSEN
+  cvp->count++;
+  up(&cvp->owner->mutex);
+  down(&cvp->sem);
+  down(&cvp->owner->mutex);
+  cvp->count--;
+#else
+    cvp->count++;
+    if (cvp->owner->next_count > 0)
+        up(&cvp->owner->next);
+    else
+        up(&cvp->owner->mutex);
+    down(&cvp->sem);
+    cvp->count--;
+#endif //HANSEN
     cprintf("cond_wait end:  cvp %x, cvp->count %d, cvp->owner->next_count %d\n", cvp, cvp->count, cvp->owner->next_count);
 }
