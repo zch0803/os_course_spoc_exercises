@@ -43,6 +43,23 @@
 
 ## 小组思考题
  1. (spoc)请以键盘输入、到标准输出设备stdout的printf输出、串口输出、磁盘文件复制为例，描述ucore操作系统I/O从请求到完成的整个执行过程，并分析I/O过程的时间开销。
+ 键盘输入
+ 用户在键盘进行输入，触发KBD中断，在trap.c的trap_dispatch()进行处理，其中断号为IRQ_KBD。
+
+```
+    case IRQ_OFFSET + IRQ_KBD:
+        c = cons_getc();
+        {
+          extern void dev_stdin_write(char c);
+          dev_stdin_write(c);
+        }
+        break;
+```
+
+调用con_getc()获取字符c，然后调用dev_stdin_write将字符c写入stdin缓冲区。 这时候如果有进程在等待键盘输入，就唤醒这个进程。
+
+时间开销主要花费在进程的切换和检查等待队列上。
+
  2. (spoc)完成磁盘访问与磁盘寻道算法的作业，具体帮助和要求信息请看[disksim指导信息](https://github.com/chyyuu/ucore_lab/blob/master/related_info/lab8/disksim-homework.md)和[disksim参考代码](https://github.com/chyyuu/ucore_lab/blob/master/related_info/lab8/disksim-homework.py)
 
 
